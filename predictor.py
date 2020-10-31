@@ -59,6 +59,11 @@ def predict(feed, model):
   ret = pred * std + mean + feed[-1]
   return ret
 
+options = {
+    'std': 'https://github.com/PerceptronV/Covid-Predictor/raw/main/corona.h5',
+    'beta': 'https://github.com/PerceptronV/Covid-Predictor/raw/main/corona_new.h5'
+}
+
 sub=os.getcwd()+'/runtime/'
 if not os.path.exists(sub):
   os.mkdir(sub)
@@ -71,11 +76,18 @@ csv_path = tf.keras.utils.get_file(
     fname=fname, cache_subdir=sub)
 df = pd.read_csv(csv_path).fillna(0)
 
-fname='corona.h5'
+choice = input('Use beta model? [Y]/[n]').strip()
+
+if choice == 'Y':
+  choice = 'beta'
+else:
+  choice = 'std'
+
+fname='model.h5'
 if os.path.exists(sub+fname):
   os.remove(sub+fname)
 model_path = tf.keras.utils.get_file(
-    origin='https://github.com/PerceptronV/Covid-Predictor/raw/main/corona.h5',
+    origin=options[choice],
     fname=fname, cache_subdir=sub)
 model = tf.keras.models.load_model(model_path)
 
