@@ -48,15 +48,30 @@ def standardize(a, d = None):
       return a, d, m, s
     return a, m, s
 
+def normalize(s, d = None, k = 0.15):
+  f = np.amax(np.absolute(s))
+  if d == None:
+    r = s / (f + k)
+    return r, f
+  elif abs(d) > f:
+    f = abs(d) + k
+  r1 = s / f
+  r2 = d / f
+  return r1, r2, f
+
 def expand(a):
   r = np.expand_dims(np.asarray(a), -1)
   return r
 
-def predict(feed, model):
+def choice(feed, model, choice):
   data, mean, std = standardize(compute_dif(feed))
+  if choice == 'beta':
+    data, factor = normalize(data)
   inp = np.expand_dims(expand(data), 0)
   pred = model.predict(inp)[0][0]
   ret = pred * std + mean + feed[-1]
+  if choice == 'beta':
+    ret = pred * factor * std + mean + feed[-1]
   return ret
 
 options = {
@@ -76,7 +91,7 @@ csv_path = tf.keras.utils.get_file(
     fname=fname, cache_subdir=sub)
 df = pd.read_csv(csv_path).fillna(0)
 
-choice = input('Use beta model? [Y]/[n]').strip()
+choice = input('Use beta model? [Y]/[n] ').strip()
 
 if choice == 'Y':
   choice = 'beta'
@@ -105,7 +120,7 @@ for inp in default:
         for i in col[1:]:
           feed=feed+i
       print(feed)
-      print(str(predict(feed, model))+'\n')
+      print(str(predict(feed, model, choice))+'\n')
     except:
       pass
   except:
@@ -122,7 +137,7 @@ while (1):
         for i in col[1:]:
           feed=feed+i
       print(feed)
-      print(str(predict(feed,model,aux,True,corrector))+'\n')
+      print(str(predict(feed,model,choice))+'\n')
     except:
       pass
   else:
