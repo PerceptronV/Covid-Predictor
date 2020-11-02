@@ -63,7 +63,7 @@ def expand(a):
   r = np.expand_dims(np.asarray(a), -1)
   return r
 
-def choice(feed, model, choice):
+def predict(feed, model, choice):
   data, mean, std = standardize(compute_dif(feed))
   if choice == 'beta':
     data, factor = normalize(data)
@@ -127,7 +127,7 @@ for inp in default:
     print('Error with default list')
 while (1):
   inp=input('Place: ')
-  if inp is not '':
+  if inp != '':
     col=list(find(inp,df))
     try:
       for i in range(len(col)):
